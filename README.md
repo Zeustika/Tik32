@@ -1,76 +1,113 @@
-## 🎥 TikTok Gift Integration with ESP32 (Local Wi-Fi)
+# 🎁 TikTok Gift Integration with ESP32 (Local Wi-Fi Only)
 
-This project enables **real-time interaction between TikTok Live gifts and an ESP32 microcontroller**, without the need for external servers or cloud services. It’s perfect for content creators who want to trigger physical devices (e.g. lights, buzzers, motors) when receiving gifts on TikTok.
+This project connects **TikTok Live gift events** to an **ESP32 microcontroller**, allowing you to trigger **relays** in real-time whenever someone sends a gift during your livestream — all over **local Wi-Fi**, with no cloud server needed.
 
----
-
-### ⚙️ How It Works
-
-- A Python script (`donasi.py`) connects to TikTok Live using [`TikTokLive`](https://github.com/TikTokLive/).
-- When a viewer sends a **gift**, the script:
-  - Parses the gift name, value, and sender.
-  - Sends the data to the ESP32 via **local HTTP POST**.
-- The ESP32 receives the data and reacts accordingly (e.g., turns on a buzzer, relay, LED, etc.).
+> 🔗 Ideal for creators who want to link TikTok donations to real-world effects like lights, fans, or other relay-controlled devices.
 
 ---
 
-### 🧰 Hardware Requirements
+## 🔧 Features
 
-- [ESP32 board](https://www.espressif.com/en/products/socs/esp32)
-- 3 channel Relay
-- Local Wi-Fi (ESP32 and PC must be on the same network)
-- Optional output devices: relay, buzzer, LED, etc.
+- 🌐 **Local HTTP Communication Only**  
+  All communication happens on your local Wi-Fi network — no port forwarding or external server required.
+
+- 🎁 **TikTok Gift Listener**  
+  Detects gift events on TikTok Live using the `TikTokLive` Python library.
+
+- 🛠️ **Relay-Based Physical Feedback**  
+  Each TikTok gift can trigger a relay, which can be connected to lights, horns, or other devices.
+
+- ⚙️ **Flexible Gift Mapping**  
+  You can assign different gift types or point values to different relay actions.
 
 ---
 
-### 📂 Project Files
+## 🧰 Hardware Requirements
 
-- `donasi.py` – Python script for reading TikTok Live gifts and sending data to ESP32.
-- `donasi.bat` – Windows batch file to launch the script quickly.
-- `TiktokIntegration.ino` – Arduino code for ESP32 that listens for `/gift` POST requests and responds to gift data.
+| Component         | Function                          |
+|------------------|-----------------------------------|
+| ESP32 (WROOM-32) | Main controller                   |
+| 3-Channel Relay Module | Activate real-world devices       |
+| Jumper Wires     | Standard male-female connectors   |
 
 ---
 
-### 🚀 How to Use
+## 🔌 Wiring Diagram (Simple)
 
-#### 1. Flash ESP32
+| ESP32 GPIO | Relay Channel | Description               |
+|------------|----------------|---------------------------|
+| GPIO 4     | Relay 1        | For gift under 100 points |
+| GPIO 5     | Relay 2        | For gift 100–499 points   |
+| GPIO 2     | Relay 3        | For gift 500+ points      |
+| GND        | Relay GND      | Common ground             |
+| 5V         | Relay VCC      | Power source (external if needed) |
 
-Upload the `TiktokIntegration.ino` sketch to your ESP32 using the Arduino IDE. Ensure the Wi-Fi credentials and static IP match the Python script.
+> ⚠️ Make sure your relay module is compatible with 3.3V logic or use external transistor/driver if needed.
 
-#### 2. Set Up Python Environment
+---
+
+## 📂 File Structure
+
+| File               | Description                                 |
+|--------------------|---------------------------------------------|
+| `TiktokIntegration.ino` | Arduino sketch for ESP32 to handle gift events |
+| `donasi.py`        | Python script to listen to TikTok gifts     |
+| `donasi.bat`       | Quick launcher for the Python script        |
+
+---
+
+## 🚀 How to Use
+
+### 1. Flash the ESP32 Code
+
+Upload `TiktokIntegration.ino` using Arduino IDE. Ensure:
+- Your Wi-Fi SSID and password are correct.
+- Static IP matches the one used in `donasi.py`.
+
+### 2. Set Up Python Environment
 
 Install dependencies:
-
 ```bash
-pip install TikTokLive rich requests
+pip install TikTokLive requests rich
 ```
 
-#### 3. Run the Script
+### 3. Run the TikTok Listener
 
-You can run the script directly:
-
+Launch the script via:
 ```bash
 python donasi.py your_tiktok_username
 ```
 
-Or double-click `donasi.bat` (after editing it to include your TikTok username).
+Or double-click `donasi.bat` (you can hardcode your TikTok username inside if needed).
 
-#### 4. Go Live on TikTok
+### 4. Go Live and Watch It Work!
 
-Once you start your live session, the script will connect and monitor gift events in real time. When a gift is received, the ESP32 will react based on your code logic.
+- When someone sends a gift on your TikTok live:
+  - `donasi.py` logs the event
+  - It sends an HTTP POST request to your ESP32
+  - ESP32 activates the corresponding relay
+
+You can customize which relay is triggered based on gift name or value inside the `donasi.py` script.
+
+---
+
+## 🧪 Example Gift Mapping
+
+In `donasi.py`, you can set logic like:
+
+```python
+if points < 100:
+    activate_relay(1)  # GPIO 4
+elif points < 500:
+    activate_relay(2)  # GPIO 5
+else:
+    activate_relay(3)  # GPIO 2
+```
 
 ---
 
-### 🧪 Example Use Case
+## 📌 Notes
 
-> A fan sends you a “Galaxy” gift on TikTok Live → your buzzer rings + LED flashes on your ESP32 desk setup.
-
----
-
-### 📌 Notes
-
-- Ensure your PC and ESP32 are on the **same local network**.
-- This integration is **local-only**; it does not expose anything to the internet.
-- You can expand this to support follower events, likes, etc., by modifying the script.
-
----
+- ESP32 and PC **must be on the same Wi-Fi network**.
+- This is a **local-only solution**. No internet or server hosting required.
+- Make sure to use a power supply that can handle the relays’ load.
