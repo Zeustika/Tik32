@@ -1,10 +1,17 @@
-# 🎁 TikTok Gift Integration with ESP32 (Local Wi-Fi Only)
+# 🎁 TikTok Gift Integration with ESP32
 
+# NEW UPDATE V2
+---
+You've have to make free account at
+https://www.eulerstream.com
+for not being limited at scrapping and paste your api to .env file
+spesial thanks to **[isaackogan](https://github.com/isaackogan)** for making the libs
+
+---
 This project connects **TikTok Live gift events** to an **ESP32 microcontroller**, allowing you to trigger **relays** in real-time whenever someone sends a gift during your livestream — all over **local Wi-Fi**, with no cloud server needed.
 
 > 🔗 Ideal for creators who want to link TikTok donations to real-world effects like lights, fans, or other relay-controlled devices.
 
----
 
 ## 🔧 Features
 
@@ -52,7 +59,9 @@ This project connects **TikTok Live gift events** to an **ESP32 microcontroller*
 |--------------------|---------------------------------------------|
 | `TiktokIntegration.ino` | Arduino sketch for ESP32 to handle gift events |
 | `donasi.py`        | Python script to listen to TikTok gifts     |
-| `donasi.bat`       | Quick launcher for the Python script        |
+| `wifi_scanner.py`  | Python script to scan esp32 at your wifi    |
+| `donasi.py`        | Python script to listen to TikTok gifts     |
+| `gift_tiktok.json` | for storing gift bvalue and information     |
 
 ---
 
@@ -62,23 +71,22 @@ This project connects **TikTok Live gift events** to an **ESP32 microcontroller*
 
 Upload `TiktokIntegration.ino` using Arduino IDE. Ensure:
 - Your Wi-Fi SSID and password are correct.
-- Static IP matches the one used in `donasi.py`.
 
 ### 2. Set Up Python Environment
 
 Install dependencies:
 ```bash
-pip install TikTokLive requests rich
+pip install -r requirements.txt
 ```
 
 ### 3. Run the TikTok Listener
 
 Launch the script via:
 ```bash
-python donasi.py your_tiktok_username
+python donasi.py your_tiktok_username your_esp32_ip
 ```
 
-Or double-click `donasi.bat` (you can hardcode your TikTok username inside if needed).
+Or double-click `donasi.bat`.
 
 ### 4. Go Live and Watch It Work!
 
