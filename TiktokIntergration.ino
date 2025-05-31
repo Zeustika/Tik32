@@ -11,7 +11,6 @@ int relay_pin_1 = 4;
 int relay_pin_2 = 5;
 int relay_pin_3 = 2;
 
-// Create a web server object
 WebServer server(80);
 
 unsigned long relayStartTime = 0;
@@ -29,38 +28,30 @@ void handleGift() {
             return;
         }
 
-        const char* gift = doc["gift"];
-        int points = doc["points"];
-        const char* user = doc["user"];
+        const char* relay = doc["relay"]; 
+        int waktu = doc["waktu"];    
+        const char* user = doc["user"];  
 
         // Log to serial monitor
-        Serial.printf("Received gift: %s\n", gift);
-        Serial.printf("Points: %d\n", points);
+        Serial.printf("Received relay command: %s\n", relay);
+        Serial.printf("Duration: %d seconds\n", waktu);
         Serial.printf("From user: %s\n", user);
 
-        // Determine relay activation duration based on points
-        switch (points) {
-            case 0 ... 2:
-                relayDuration = 1; // 1 second activation
-                activateRelay(relay_pin_1);
-                break;
-            case 3 ... 19:
-                relayDuration = 2; // 2 seconds activation
-                activateAllRelays();
-                
-                break;
-            case 20 ... 50:
-                relayDuration = 3; // 3 seconds activation
-                activateAllRelays();
-                break;
-            case 51 ... 100:
-                relayDuration = 4; // 4 seconds activation
-                activateRelay(relay_pin_1);
-                break;
-            default:
-                relayDuration = 5; // 5 seconds activation for higher points
-                activateRelay(relay_pin_2);
-                break;
+        // Determine relay activation based on relay command
+        if (strcmp(relay, "relay1nyala") == 0) {
+            relayDuration = waktu;
+            activateRelay(relay_pin_1);
+        } else if (strcmp(relay, "relay2nyala") == 0) {
+            relayDuration = waktu;
+            activateRelay(relay_pin_2);
+        } else if (strcmp(relay, "relay3nyala") == 0) {
+            relayDuration = waktu;
+            activateRelay(relay_pin_3);
+        } else if (strcmp(relay, "semuarelaynyala") == 0) {
+            relayDuration = waktu;
+            activateAllRelays();
+        } else {
+            Serial.println("Unknown relay command received.");
         }
 
         // Send a success response
@@ -71,7 +62,7 @@ void handleGift() {
 }
 
 void activateRelay(int relayPin) {
-    digitalWrite(relayPin, LOW); // Activate relay (assuming LOW triggers the relay)
+    digitalWrite(relayPin, LOW);
     relayStartTime = millis();
     isRelayActive = true;
     Serial.printf("Activating relay %d for %d seconds...\n", relayPin, relayDuration);
